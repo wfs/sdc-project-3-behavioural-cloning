@@ -40,12 +40,12 @@ class Preprocess:
 
         # Break the log into separate lists for each set of angles from -1 to 1 with a step size of 0.1.
         angles_lists = []
-        for i in np.arange(-1.0, 1.0, 0.1):  #
-            angles_lists.append(log[(log['steering'] > i) & (log['steering'] < (i + 0.1))])
+        for i in np.arange(-1.0, 1.0, 0.1):  # Return evenly spaced values within a given interval.
+            angles_lists.append(log[(log['steering'] > i) & (log['steering'] < (i + 0.1))])  # append list of angles in a 0.1 bucket
 
         truncated_log_list = angles_lists[0]
 
-        # Truncate angles counted at 2584 down to 610 items.
+        # Truncate angles counted at 2584 down to 610 items. This was the final preprocessing experiment that resulted in Track 2 success!
         for i in range(1, len(angles_lists)):
             if angles_lists[i].size < 2584:
                 truncated_log_list = pd.concat([truncated_log_list, angles_lists[i]])
@@ -264,17 +264,17 @@ class Preprocess:
             Lambda(lambda x: (x - 127.5) / 255, input_shape=(img_shape), output_shape=(img_shape),
                    name='Normalization'))
 
-        model.add(Convolution2D(32, 5, 5, border_mode='valid', subsample=(2, 2)))  # , activation='elu'))
+        # nvidia end-to-end-dl-using-px model
+        model.add(Convolution2D(32, 5, 5, border_mode='valid', subsample=(2, 2)))
         model.add(PReLU())
-        model.add(Convolution2D(64, 5, 5, border_mode='valid', subsample=(2, 2)))  # , activation='prelu'))
+        model.add(Convolution2D(64, 5, 5, border_mode='valid', subsample=(2, 2)))
         model.add(PReLU())
-        model.add(Convolution2D(128, 5, 5, border_mode='valid', subsample=(2, 2)))  # , activation='prelu'))
+        model.add(Convolution2D(128, 5, 5, border_mode='valid', subsample=(2, 2)))
         model.add(PReLU())
-        # model.add(Dropout(dropout))
 
-        model.add(Convolution2D(128, 3, 3, border_mode='valid', subsample=(1, 1)))  # , activation='prelu'))
+        model.add(Convolution2D(128, 3, 3, border_mode='valid', subsample=(1, 1)))
         model.add(PReLU())
-        model.add(Convolution2D(128, 3, 3, border_mode='valid', subsample=(1, 1)))  # , activation='prelu'))
+        model.add(Convolution2D(128, 3, 3, border_mode='valid', subsample=(1, 1)))
         model.add(PReLU())
         model.add(Dropout(dropout))
 
@@ -282,25 +282,25 @@ class Preprocess:
         model.add(Flatten())
 
         # fully connected layers with dropout
-        #model.add(Dense(512))  # ,activation='prelu'))  # 1. smoothest, crashes before middle of Test track 2
-        #model.add(PReLU())
-        #model.add(Dropout(dropout))
+        # model.add(Dense(512))  # 1. smoothest, crashes before middle of Test track 2
+        # model.add(PReLU())
+        # model.add(Dropout(dropout))
 
-        model.add(Dense(256))  # ,activation='prelu'))  # 2. less smooth, crashes later, tight turn mountain top
+        model.add(Dense(256))  # 2. less smooth, crashes later, tight turn mountain top
         model.add(PReLU())
         model.add(Dropout(dropout))
 
-        model.add(Dense(128))  # ,activation='prelu'))  # 3. litte jerky, crashes later than location of 2. above
-        #model.add(Dense(100))  # ,activation='prelu'))  # 4. little jerky and crashes same location as 2. above
+        model.add(Dense(128))  # 3. litte jerky, crashes later than location of 2. above
+        # model.add(Dense(100))  # 4. little jerky and crashes same location as 2. above
         model.add(PReLU())
         model.add(Dropout(dropout))
 
-        model.add(Dense(64))  # ,activation='prelu'))  # 3. little jerky and crashes just a bit further than location of 2. above
-        #model.add(Dense(50))  # ,activation='prelu'))
+        model.add(Dense(64))  # 3. little jerky and crashes just a bit further than location of 2. above
+        # model.add(Dense(50))
         model.add(PReLU())
         model.add(Dropout(dropout))
 
-        model.add(Dense(1, name='OutputAngle'))  # ,  activation='relu', name='Out'\
+        model.add(Dense(1, name='OutputAngle'))
         model.compile(optimizer='nadam', loss='mse')
         return model
 
