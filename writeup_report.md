@@ -14,13 +14,27 @@ The goals / steps of this project are the following:
 
 **Image References**
 
-[image1]: ./examples/placeholder.png "Preprocess Visualization"
-[image2]: ./examples/placeholder.png "Grayscaling"
-[image3]: ./examples/placeholder_small.png "Recovery Image"
-[image4]: ./examples/placeholder_small.png "Recovery Image"
-[image5]: ./examples/placeholder_small.png "Recovery Image"
-[image6]: ./examples/placeholder_small.png "Normal Image"
-[image7]: ./examples/placeholder_small.png "Flipped Image"
+[image1]: ./visualising_camera_views_incl_code.png "Visualing the 3 camera views"
+[image2]: ./telemetry_statistics.png "Telemetry statistics"
+[image3]: ./steering_angles_histogram_incl_code.png "Steering angles histogram"
+[image4]: ./spatial_reduction_calcs.png "Layer 1 spatial reduction calcs"
+[image5]: ./tools.png "Toolset"
+[image6]: ./track_2_failure.png "Test track 2 failure"
+[image7]: ./track_2_completed.png "Test track 2 success"
+
+[Visualing the 3 camera views](./visualising_camera_views_incl_code.png)
+
+[Telemetry statistics](./telemetry_statistics.png)
+
+[Steering angles histogram](./steering_angles_histogram_incl_code.png)
+
+[Layer 1 spatial reduction calcs](./spatial_reduction_calcs.png)
+ 
+[Toolset](./tools.png)
+
+[Test track 2 failure](./track_2_failure.png)
+
+[Test track 2 success](./track_2_completed.png)
 
 ## Rubric Points
 ### Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
