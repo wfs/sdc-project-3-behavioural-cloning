@@ -32,7 +32,7 @@ class Preprocess:
     def truncate_highly_logged_angles():
         """
         Create angle telemetry lists sized 0.1, then reduce the large lists,
-        to make more even distribution of examples and reduce bias.
+        to make more even distribution of examples and reduce bias using fibonacci sequences.
         """
         global log
 
@@ -57,6 +57,11 @@ class Preprocess:
     @staticmethod
     def create_left_right_steering_angles():
         """
+        This function replaces the need to manually record Recovery Training data.
+
+        Inspired by Vivek Yadav's post
+        https://chatbotslife.com/using-augmentation-to-mimic-human-driving-496b569760a9#.yh93soib0
+
         Telemetry is provided based on centre camera images.
         This function takes centre image angle then
         adds 0.25 to create left image angles,
@@ -120,28 +125,15 @@ class Preprocess:
         return dst
 
     @staticmethod
-    def randomise_image_brightness(image):
-        """
-        Brightness - referenced Vivek Yadav post
-        https://chatbotslife.com/using-augmentation-to-mimic-human-driving-496b569760a9#.yh93soib0
-        :param image: Input image
-        :return: return an image in RGB Color space with randomly modified image brightness.
-        """
-        hsv = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
-        bv = .4 + np.random.uniform()
-        hsv[::2] = hsv[::2] * bv
-
-        return cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
-
-    @staticmethod
     def transform_image_and_steering_angle(image, steering):
         """
         Horizontal shift of images (x-axis) to simulate car being at different positions on the road.
         Adjust steering angle by [-0.008 ... 0.008] per pixel shift.
         Vertical shift of image (y-axis) to simulate effect of car driving up or down sloped road.
 
-        # Based on Vivek Yadav post
-        # https://chatbotslife.com/using-augmentation-to-mimic-human-driving-496b569760a9#.yh93soib0
+        Inspired by Vivek Yadav's post
+        https://chatbotslife.com/using-augmentation-to-mimic-human-driving-496b569760a9#.yh93soib0
+
         :param image : input image
         :param steering : steering angle
         :return: return an image which is randomly shifted and the corresponding steering angle adjustment.
@@ -305,10 +297,8 @@ class Preprocess:
         return model
 
 
-# Start of the main function
 if __name__ == '__main__':
-    # Edit these for your own environment.
-    # Preprocess.set_parameters()
+    # Edit the class CONSTANTS at the top of this file for your own environment.
 
     # Even out angle telemetry distribution.
     Preprocess.truncate_highly_logged_angles()
@@ -319,20 +309,24 @@ if __name__ == '__main__':
     # Separate datasets, ready for model training / validation.
     Preprocess.split_out_training_and_validation_datasets()
 
-    # build model and display layers
+    # Build model and display layers
     model = Preprocess.build_nvidia_model(dropout=DROPOUT)
     print(model.summary())
 
     plot(model, to_file='model.png', show_shapes=True)
 
+    # Save checkpoint to enable EarlyStopping
     checkpoint = ModelCheckpoint("checkpoints/model-{val_loss:.4f}.h5",
                                  monitor='val_loss', verbose=1,
                                  save_weights_only=True, save_best_only=True)
 
+    # Save logs for TensorBoard network investigations
     tensorboard = TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=False)
 
+    # Model training / validation can overshoot minimum, so stop training when this occurs.
     earlystopping = EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=1, mode='auto')
 
+    # Train model in batches, 1 image at a time.
     model.fit_generator(Preprocess.training_data_generator(PATH, BATCH_SIZE),
                         samples_per_epoch=BATCH_SIZE * int(num_train_images / BATCH_SIZE),
                         nb_epoch=EPOCHS, callbacks=[earlystopping, checkpoint],
@@ -340,11 +334,8 @@ if __name__ == '__main__':
                         nb_val_samples=num_test_images)
 
     # save weights and model
-    # model.save_weights('model.h5')
     model.save_weights('model_weights.h5')
-    # print(json.dumps(model.to_json(), sort_keys=True, indent=4))
     with open('model.json', 'w') as modelfile:
-        # json.dump(model.to_json(), modelfile)
         modelfile.write(model.to_json())
 
     # Fri, 10/Feb/2017 new project submission requirement : combine weights (.h5) + model (.json) into model.h5.
