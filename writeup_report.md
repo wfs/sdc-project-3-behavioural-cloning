@@ -185,7 +185,7 @@ the car was driving around track one aka to establish cause and effect.
 
 I also viewed track 2 performance to see if the model would generalise. The key issue was
 the tight turn at the top of the mountain which is not present on track 1.
-* ![Test track 2 failure](./track_2_failure.png)
+* ![Test track 2 GIF - Failure](./track_2_fail_ubuntu_desktop_in_background.gif)
 * [Test track 2 GIF - Failure](./track_2_fail_ubuntu_desktop_in_background.gif)
 
 I resisted the temptation of recording this section of track 2 and retraining the model as 
