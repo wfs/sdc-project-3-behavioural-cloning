@@ -183,7 +183,7 @@ To augment the data, I :
 ---
 
 ## Project Specification
-**Here I will consider the [rubic points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation. **
+**Here I will consider the [rubic points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.**
 
 ---
 
