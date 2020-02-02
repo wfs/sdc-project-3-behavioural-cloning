@@ -2,9 +2,13 @@
 
 ---
 
+The goal was to take the [Udacity car simulator](https://github.com/udacity/self-driving-car-sim) and initial data and create an autonomous agent that successfully drives Training Track 1 (flat, bright, meandering turns). This was similar to the open-source competition that our [ai-world-car team](https://medium.com/@andrew.d.wilkie/self-driving-car-engineer-diary-1-33cf9f8ff1cd) competed in last year. The real test was to see if your model generalised to be able to drive the ‘unseen’ Test Track 2 (mountainous, dark, sharp turns). 
+
+---
+
 **Behavrioal Cloning Project**
 
-The goals / steps of this project are the following:
+The steps of this project are the following:
 * Use the simulator to collect data of good driving behavior
 * Build, a convolution neural network in Keras that predicts steering angles from images
 * Train and validate the model with a training and validation set
@@ -121,7 +125,7 @@ if __name__ == '__main__':
 
 ### Preprocess Architecture and Training Strategy
 
-#### 1. An appropriate model architecture has been employed
+**1. An appropriate model architecture has been employed**
 
 My model consists of a convolution neural network based on nvidia end-to-end model with 5x5 filter sizes and 
 depths between 32 and 128 (model.py lines 246 - 305) 
@@ -129,7 +133,7 @@ depths between 32 and 128 (model.py lines 246 - 305)
 The model includes PReLU layers to introduce nonlinearity for the activation (e.g. code line 269), and the data is normalized in the 
 model using a Keras lambda layer (code line 264-5). 
 
-####2. Attempts to reduce overfitting in the model
+**2. Attempts to reduce overfitting in the model**
 
 The model contains dropout layers in order to reduce overfitting (e.g. model.py lines 279). 
 
@@ -140,11 +144,11 @@ with changing a single variable to ensre that the vehicle could stay on the trac
 * [Training track 1 GIF](./track_1_lap_1_success.gif)
 * [Training track 1 success complete video](https://www.youtube.com/watch?v=bmZ-OaNCpcw)
 
-####3. Preprocess parameter tuning
+**3. Preprocess parameter tuning**
 The model used an adam optimizer (nadam), so the learning rate was not tuned 
 manually (model.py line 304).
 
-####4. Appropriate training data
+**4. Appropriate training data**
 
 Training data was chosen to keep the vehicle driving on the road. I applied the 
 [approach documented](https://chatbotslife.com/using-augmentation-to-mimic-human-driving-496b569760a9#.aws3sjkru) by a fellow 
@@ -200,7 +204,7 @@ track 2 without leaving the road.
 * ![Test track 2 success](./track_2_completed.png)
 * [Test track 2 success complete video](https://www.youtube.com/watch?v=2eJhYIdonVo)
 
-####2. Final Preprocess Architecture
+**2. Final Preprocess Architecture**
 
 The final model architecture (model.py lines 18-24) consisted of a convolution neural network 
 with the following layers and layer sizes ...
@@ -266,7 +270,7 @@ Here is a visualization of the architecture ...
 
 ![Model](./model.png)
 
-####3. Creation of the Training Set & Training Process
+**3. Creation of the Training Set & Training Process**
 
 To capture 'good' driving behavior, I first tried to record two laps on track one using center lane driving.
 
