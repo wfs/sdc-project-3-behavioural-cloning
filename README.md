@@ -1,127 +1,19 @@
 # **Behavioral Cloning** 
 
+The goal was to take the [Udacity car simulator](https://github.com/udacity/self-driving-car-sim) and initial data and create an autonomous agent that successfully drives Training Track 1 (flat, bright, meandering turns). This was similar to the open-source competition that our [ai-world-car team](https://medium.com/@andrew.d.wilkie/self-driving-car-engineer-diary-1-33cf9f8ff1cd) competed in at the end of 2016.
+
+The real test was to see if your model generalised to be able to drive the ‘unseen’ Test Track 2 (mountainous, dark, sharp turns), which mine did after much trial-and-error.
+
 ---
 
-The goal was to take the [Udacity car simulator](https://github.com/udacity/self-driving-car-sim) and initial data and create an autonomous agent that successfully drives Training Track 1 (flat, bright, meandering turns). This was similar to the open-source competition that our [ai-world-car team](https://medium.com/@andrew.d.wilkie/self-driving-car-engineer-diary-1-33cf9f8ff1cd) competed in last year. The real test was to see if your model generalised to be able to drive the ‘unseen’ Test Track 2 (mountainous, dark, sharp turns). 
-
----
-
-**Behavrioal Cloning Project**
+**Project Approach**
 
 The steps of this project are the following:
-* Use the simulator to collect data of good driving behavior
-* Build, a convolution neural network in Keras that predicts steering angles from images
-* Train and validate the model with a training and validation set
-* Test that the model successfully drives around track one without leaving the road
-* Summarize the results with a written report
-
-
-**Image References**
-
-[Visualing the 3 camera views](./visualising_camera_views_incl_code.png)
-
-[Telemetry statistics](./telemetry_statistics.png)
-
-[Steering angles histogram](./steering_angles_histogram_incl_code.png)
-
-[Layer 1 spatial reduction calcs](./spatial_reduction_calcs.png)
-
-[Model](./model.png)
- 
-[Toolset](./tools.png)
-
-[Cropped images example](./cropped_images_example.png)
-
-[Randomly shadowed images example](./randomly_shadowed_images_example.png)
-
-[Original image example](./original_image.png)
-
-[Original image shadowed and mirrored example](./original_image_shadowed_and_mirrored.png)
-
-[Training track 1 GIF](./track_1_lap_1_success.gif)
-
-[Training track 1 success complete video](https://www.youtube.com/watch?v=bmZ-OaNCpcw)
-
-[Test track 2 failure](./track_2_failure.png)
-
-[Test track 2 GIF - Failure](./track_2_fail_ubuntu_desktop_in_background.gif)
-
-[Test track 2 success](./track_2_completed.png)
-
-[Test track 2 success complete video](https://www.youtube.com/watch?v=2eJhYIdonVo)
-
-## Rubric Points
-### Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
-
----
-
-### Files Submitted & Code Quality
-
-#### 1. Submission includes all required files and can be used to run the simulator in autonomous mode
-
-My project includes the following files:
-1. model.py containing the script to create and train the model
-1. drive.py for driving the car in autonomous mode
-1. model.h5 containing a trained convolution neural network 
-1. writeup_report.md summarizing the results
-
-#### 2. Submssion includes functional code
-Using the Udacity provided simulator and my drive.py file, the car can be driven autonomously around the track 
-by executing 
-```sh
-python drive.py model.h5
-```
-
-#### 3. Submssion code is usable and readable
-
-The model.py file contains the code for training and saving the convolution neural network. The file shows 
-the pipeline I used for training and validating the model, and it contains comments to explain how the code works.
-```python
-if __name__ == '__main__':
-    # Edit the class CONSTANTS at the top of this file for your own environment.
-
-    # Even out angle telemetry distribution.
-    Preprocess.truncate_highly_logged_angles()
-
-    # Generate more simulated telemetry angle data.
-    Preprocess.create_left_right_steering_angles()
-
-    # Separate datasets, ready for model training / validation.
-    Preprocess.split_out_training_and_validation_datasets()
-
-    # Build model and display layers
-    model = Preprocess.build_nvidia_model(dropout=DROPOUT)
-    print(model.summary())
-
-    plot(model, to_file='model.png', show_shapes=True)
-
-    # Save checkpoint to enable EarlyStopping
-    checkpoint = ModelCheckpoint("checkpoints/model-{val_loss:.4f}.h5",
-                                 monitor='val_loss', verbose=1,
-                                 save_weights_only=True, save_best_only=True)
-
-    # Save logs for TensorBoard network investigations
-    tensorboard = TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=False)
-
-    # Model training / validation can overshoot minimum, so stop training when this occurs.
-    earlystopping = EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=1, mode='auto')
-
-    # Train model in batches, 1 image at a time.
-    model.fit_generator(Preprocess.training_data_generator(PATH, BATCH_SIZE),
-                        samples_per_epoch=BATCH_SIZE * int(num_train_images / BATCH_SIZE),
-                        nb_epoch=EPOCHS, callbacks=[earlystopping, checkpoint],
-                        validation_data=Preprocess.validation_data_generator(VAL_PATH, BATCH_SIZE),
-                        nb_val_samples=num_test_images)
-
-    # save weights and model
-    model.save_weights('model_weights.h5')
-    with open('model.json', 'w') as modelfile:
-        modelfile.write(model.to_json())
-
-    # Fri, 10/Feb/2017 new project submission requirement : combine weights (.h5) + model (.json) into model.h5.
-    model.save('model.h5')
-
-```
+- Use the simulator to collect data of good driving behavior
+- Build, a convolution neural network in Keras that predicts steering angles from images
+- Train and validate the model with a training and validation set
+- Test that the model successfully drives around track one without leaving the road
+- Summarize the results with a written report
 
 ### Preprocess Architecture and Training Strategy
 
@@ -140,9 +32,9 @@ The model contains dropout layers in order to reduce overfitting (e.g. model.py 
 The model was trained and validated on different data sets to ensure that the model was not overfitting 
 (code line 73-82). The model was tested by running it through the simulator on Track 1 each time I experimented 
 with changing a single variable to ensre that the vehicle could stay on the track.
-* ![Training track 1 GIF](./track_1_lap_1_success.gif)
-* [Training track 1 GIF](./track_1_lap_1_success.gif)
-* [Training track 1 success complete video](https://www.youtube.com/watch?v=bmZ-OaNCpcw)
+- ![Training track 1 GIF](./track_1_lap_1_success.gif)
+- [Training track 1 GIF](./track_1_lap_1_success.gif)
+- [Training track 1 success complete video](https://www.youtube.com/watch?v=bmZ-OaNCpcw)
 
 **3. Preprocess parameter tuning**
 The model used an adam optimizer (nadam), so the learning rate was not tuned 
@@ -156,9 +48,10 @@ student [Vivek Yadav](https://medium.com/@vivek.yadav) to generate random recove
 and shadowed training images. 
 
 For details about how I created the training data, see the next section. 
-
+<br>
 ###Preprocess Architecture and Training Strategy
-####1. Solution Design Approach
+
+**1. Solution Design Approach**
 
 The overall strategy for deriving a model architecture was to start with a
 proven model and then fine-tune the architecture and parameters until it 
@@ -286,3 +179,114 @@ To augment the data, I :
 3. randomly mirrored the image and associated steering angle
 * ![Original image example](./original_image.png) original
 * ![Original image shadowed and mirrored example](./original_image_shadowed_and_mirrored.png) shadowed and mirrored
+
+---
+
+## Project Specification
+**Here I will consider the [rubic points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation. **
+
+---
+
+### Files Submitted & Code Quality
+
+#### 1. Submission includes all required files and can be used to run the simulator in autonomous mode
+
+My project includes the following files:
+1. model.py containing the script to create and train the model
+2. drive.py for driving the car in autonomous mode
+3. model.h5 containing a trained convolution neural network 
+4. writeup_report.md summarizing the results
+
+#### 2. Submssion includes functional code
+Using the Udacity provided simulator and my drive.py file, the car can be driven autonomously around the track 
+by executing 
+```sh
+python drive.py model.h5
+```
+
+#### 3. Submssion code is usable and readable
+
+The model.py file contains the code for training and saving the convolution neural network. The file shows 
+the pipeline I used for training and validating the model, and it contains comments to explain how the code works.
+```python
+if __name__ == '__main__':
+    # Edit the class CONSTANTS at the top of this file for your own environment.
+
+    # Even out angle telemetry distribution.
+    Preprocess.truncate_highly_logged_angles()
+
+    # Generate more simulated telemetry angle data.
+    Preprocess.create_left_right_steering_angles()
+
+    # Separate datasets, ready for model training / validation.
+    Preprocess.split_out_training_and_validation_datasets()
+
+    # Build model and display layers
+    model = Preprocess.build_nvidia_model(dropout=DROPOUT)
+    print(model.summary())
+
+    plot(model, to_file='model.png', show_shapes=True)
+
+    # Save checkpoint to enable EarlyStopping
+    checkpoint = ModelCheckpoint("checkpoints/model-{val_loss:.4f}.h5",
+                                 monitor='val_loss', verbose=1,
+                                 save_weights_only=True, save_best_only=True)
+
+    # Save logs for TensorBoard network investigations
+    tensorboard = TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=False)
+
+    # Model training / validation can overshoot minimum, so stop training when this occurs.
+    earlystopping = EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=1, mode='auto')
+
+    # Train model in batches, 1 image at a time.
+    model.fit_generator(Preprocess.training_data_generator(PATH, BATCH_SIZE),
+                        samples_per_epoch=BATCH_SIZE * int(num_train_images / BATCH_SIZE),
+                        nb_epoch=EPOCHS, callbacks=[earlystopping, checkpoint],
+                        validation_data=Preprocess.validation_data_generator(VAL_PATH, BATCH_SIZE),
+                        nb_val_samples=num_test_images)
+
+    # save weights and model
+    model.save_weights('model_weights.h5')
+    with open('model.json', 'w') as modelfile:
+        modelfile.write(model.to_json())
+
+    # Fri, 10/Feb/2017 new project submission requirement : combine weights (.h5) + model (.json) into model.h5.
+    model.save('model.h5')
+
+```
+---
+**Image References**
+
+[Visualing the 3 camera views](./visualising_camera_views_incl_code.png)
+
+[Telemetry statistics](./telemetry_statistics.png)
+
+[Steering angles histogram](./steering_angles_histogram_incl_code.png)
+
+[Layer 1 spatial reduction calcs](./spatial_reduction_calcs.png)
+
+[Model](./model.png)
+ 
+[Toolset](./tools.png)
+
+[Cropped images example](./cropped_images_example.png)
+
+[Randomly shadowed images example](./randomly_shadowed_images_example.png)
+
+[Original image example](./original_image.png)
+
+[Original image shadowed and mirrored example](./original_image_shadowed_and_mirrored.png)
+
+[Training track 1 GIF](./track_1_lap_1_success.gif)
+
+[Training track 1 success complete video](https://www.youtube.com/watch?v=bmZ-OaNCpcw)
+
+[Test track 2 failure](./track_2_failure.png)
+
+[Test track 2 GIF - Failure](./track_2_fail_ubuntu_desktop_in_background.gif)
+
+[Test track 2 success](./track_2_completed.png)
+
+[Test track 2 success complete video](https://www.youtube.com/watch?v=2eJhYIdonVo)
+
+---
